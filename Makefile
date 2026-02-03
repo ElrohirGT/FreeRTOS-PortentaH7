@@ -23,7 +23,7 @@ all: $(SUB_DIR)
     	do $(MAKE) -C $$subdir all || exit 1; \
     done
 	# TODO: Uncomment this once the test.elf rule works!
-	# $(MAKE) test.elf
+	$(MAKE) test.elf
 	@echo Leave $(CURR_DIR)
 
 .PHONY: remake
@@ -52,10 +52,10 @@ clean:
 OBJ := $(shell find . -name "*.o")
 
 # This should work (?
-# .PHONY: test.elf
-# test.elf: $(OBJ)
-# 	$(CXX) $(LDFLAGS_ALL_$(MCU)) $^ -o $(INO_DIR)/$@
-# 	$(OBJCPY) -O binary $(INO_DIR)/$@ $(INO_DIR)/$@.bin
+.PHONY: test.elf
+test.elf: $(OBJ)
+	$(CXX) $(LDFLAGS_ALL_$(MCU)) $^ -o $(INO_DIR)/$@
+	$(OBJCPY) -O binary $(INO_DIR)/$@ $(INO_DIR)/$@.bin
 
 .PHONY: code_line_count
 code_line_count:
