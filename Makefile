@@ -22,8 +22,11 @@ all: $(SUB_DIR)
 	@for subdir in $(SUB_DIR); \
     	do $(MAKE) -C $$subdir all || exit 1; \
     done
+	$(MAKE) info
 	# TODO: Uncomment this once the test.elf rule works!
-	$(MAKE) test.elf
+	$(MAKE) test_$(MCU).elf
+	# $(MAKE) test_m4.elf
+	# $(MAKE) test_m7.elf
 	@echo Leave $(CURR_DIR)
 
 .PHONY: remake
@@ -49,11 +52,17 @@ clean:
 	@echo Deleting Completed
 	@echo Leave $(CURR_DIR)
 
-OBJ := $(shell find . -name "*.o")
+OBJ_M4 := $(shell $(find . -path "./CM7" -prune -o -print | grep "\.o$"))
+OBJ_M7 := $(shell $(find . -path "./CM4" -prune -o -print | grep "\.o$"))
 
 # This should work (?
-.PHONY: test.elf
-test.elf: $(OBJ)
+.PHONY: test_M4.elf
+test_M4.elf: $(OBJ_M4)
+	$(CXX) $(LDFLAGS_ALL_$(MCU)) $^ -o $(INO_DIR)/$@
+	$(OBJCPY) -O binary $(INO_DIR)/$@ $(INO_DIR)/$@.bin
+
+.PHONY: test_M7.elf
+test_M7.elf: $(OBJ_M7)
 	$(CXX) $(LDFLAGS_ALL_$(MCU)) $^ -o $(INO_DIR)/$@
 	$(OBJCPY) -O binary $(INO_DIR)/$@ $(INO_DIR)/$@.bin
 
@@ -101,4 +110,5 @@ info:
 	@echo FREERTOS_IAR_DIR: $(FREERTOS_IAR_DIR)
 	@echo STM32H7XXHAL_INCLUDE_DIR: $(STM32H7XXHAL_INCLUDE_DIR)
 	@echo CMSIS_INCLUDE_DIR: $(CMSIS_INCLUDE_DIR)
-	@echo OBJ: $(OBJ)
+	@echo OBJ_M4: $(OBJ_M4)
+	@echo OBJ_M7: $(OBJ_M7)

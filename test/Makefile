@@ -25,8 +25,9 @@ all: $(SUB_DIR)
 	@for subdir in $(SUB_DIR); \
     	do $(MAKE) -C $$subdir all || exit 1; \
     done
-	@# $(MAKE) info
-	$(MAKE) test
+	# @$(MAKE) $(patsubst %.c, %.o, $(wildcard *.c))
+	# $(MAKE) info
+	# $(MAKE) test
 	echo Leave $(CURR_DIR)
 
 ifeq ($(MCU),M4)
