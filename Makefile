@@ -52,8 +52,11 @@ clean:
 	@echo Deleting Completed
 	@echo Leave $(CURR_DIR)
 
-OBJ_M4 := $(shell $(find . -path "./CM7" -prune -o -print | grep "\.o$"))
-OBJ_M7 := $(shell $(find . -path "./CM4" -prune -o -print | grep "\.o$"))
+# OBJ_M4 := $(shell find  . -path ./CM7 -prune -o -name "*.o" -print -o -name "*4.ino" -print)
+# OBJ_M7 := $(shell find  . -path ./CM4 -prune -o -name "*.o" -print -o -name "*7.ino" -print)
+
+OBJ_M4 := $(shell find  . -path ./CM7 -prune -o -name "*.o" -print)
+OBJ_M7 := $(shell find  . -path ./CM4 -prune -o -name "*.o" -print)
 
 # This should work (?
 .PHONY: test_M4.elf
