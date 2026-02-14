@@ -24,6 +24,8 @@
           gnumake
           dfu-util
           bear
+          yamllint
+          go-task
         ];
       };
     });
