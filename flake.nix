@@ -20,11 +20,16 @@
     in {
       default = pkgs.mkShell {
         packages = with pkgs.pkgsCross.arm-embedded; [
+          # Project
           gcc
-          gnumake
           dfu-util
+
+          # Language server
           bear
+
+          # Build system
           yamllint
+          yamlfmt
           go-task
         ];
       };
