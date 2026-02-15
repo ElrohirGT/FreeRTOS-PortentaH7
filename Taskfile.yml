@@ -12,7 +12,17 @@ includes:
 tasks:
   compile-m4:
     internal: true
-    dir: ./CM4/
+    cmds:
+      - task: compile-core
+        vars:
+          ARCH_NUMBER: "4"
+          EXTRA_FLAGS: "-MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DCORE_CM4"
+  compile-core:
+    internal: true
+    vars:
+      ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
+      EXTRA_FLAGS: '{{default "-MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DCORE_CM4" .EXTRA_FLAGS}}'
+    dir: ./CM{{.ARCH_NUMBER}}/
     sources:
       - "**/*.c"
       - "./include/*"
@@ -27,35 +37,72 @@ tasks:
               -I../FreeRTOS/include/ -I./include/ \
               -I../FreeRTOS/portable/ARM_CM4F_GCC/ -I../STM32H747/include/ \
               -I../FreeRTOS/CMSIS_RTOS_V2/ \
-              -MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 \
-              -DSTM32H747xx -DCORE_CM4
+              {{.EXTRA_FLAGS}} \
+              -DSTM32H747xx -DCORE_CM{{.ARCH_NUMBER}}
           done
   build-m4-image:
-    desc: Build the M4 image.
-    deps:
-      - stm32:build-static-m4
-      - rtos:build-m4
-    sources:
-      - "./CM4/*.o"
-      - "./FreeRTOS/**/*.o"
-    generates:
-      - "./test/test_M4.elf.bin"
+    desc: Build the CM4 Portenta Image
+    cmds:
+      - task: build-image
+        vars:
+          ARCH_NUMBER: "4"
+          PRUNE_PATH: "./CM7"
+  build-image:
+    internal: true
     vars:
+      ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
+      PRUNE_PATH: '{{default "./CM7/" .PRUNE_PATH}}'
       LDFLAGS_ALL: |-
         -Wl,--gc-sections -Wall -Wextra -Wl,--as-needed \
-        @./CM4/include/ldflags.txt \
-        -T./CM4/include/ldscript.ld \
-        -Wl,-Map,./test/test_m4.map --specs=nosys.specs \
-        -o ./test/test_m4.elf \
+        @./CM{{.ARCH_NUMBER}}/include/ldflags.txt \
+        -T./CM{{.ARCH_NUMBER}}/include/ldscript.ld \
+        -Wl,-Map,./test/test_m{{.ARCH_NUMBER}}.map --specs=nosys.specs \
+        -o ./test/test_m{{.ARCH_NUMBER}}.elf \
         -Wl,--whole-archive \
         -Wl,--no-whole-archive \
         -Wl,--start-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys \
         -Wl,--end-group
+    requires:
+      vars: ["ARCH_NUMBER", "PRUNE_PATH"]
+    deps:
+      - stm32:build-static-m{{.ARCH_NUMBER}}
+      - rtos:build-m{{.ARCH_NUMBER}}
+    sources:
+      - "./CM{{.ARCH_NUMBER}}/*.o"
+      - "./FreeRTOS/**/*.o"
+    generates:
+      - "./test/test_M{{.ARCH_NUMBER}}.elf.bin"
     cmds:
-      # - task: stm32:build-static-m4
-      # - task: rtos:build-m4
-      - task: compile-m4
+      - task: compile-m{{.ARCH_NUMBER}}
       - cmd: |-
-          files=$(find  . -path ./CM7 -prune -o -name "*.o" -print)
-          arm-none-eabi-g++ {{.LDFLAGS_ALL}} $files -o ./test/test_M4.elf
-      - cmd: arm-none-eabi-objcopy -O binary ./test/test_M4.elf ./test/test_M4.elf.bin
+          set -exu
+          files=$(find  . -path {{.PRUNE_PATH}} -prune -o -name "*.o" -print)
+          arm-none-eabi-g++ {{.LDFLAGS_ALL}} $files -o ./test/test_M{{.ARCH_NUMBER}}.elf
+      - cmd: arm-none-eabi-objcopy -O binary ./test/test_M{{.ARCH_NUMBER}}.elf ./test/test_M{{.ARCH_NUMBER}}.elf.bin
+  clean:
+    desc: Cleans all generated files
+    cmds:
+      - cmd: |-
+          set +e
+          rm ./**/*.o
+          rm ./**/*.d
+          rm -r ./CM7/libs/ || rm ./CM7/libs/
+          rm -r ./CM4/libs/ || rm ./CM4/libs/
+          rm ./test/test_M4.elf.bin
+          rm ./test/test_M7.elf.bin
+  upload-m4-image:
+    desc: Upload the M4 image to the portenta.
+    vars:
+      ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
+      DEVICE: '{{default "0x2341:0x035b" .DEVICE}}'
+      ADDRESS: '{{default "0x08100000:leave" .ADDRESS}}'
+    preconditions:
+      - sh: |-
+          if [ ! -f ./test/test_M4.elf.bin ]; then
+              exit 1
+          fi
+        msg: "The ./test/test_M4.elf.bin image couldn't be found! Are you sure this file exists? (If not, try using the build-m4-image task!)"
+    sources:
+      - "./test/test_M4.elf.bin"
+    cmds:
+      - dfu-util --device {{.DEVICE}} -D ./test/test_M{{.ARCH_NUMBER}}.elf.bin -a0 --dfuse-address={{.ADDRESS}}
