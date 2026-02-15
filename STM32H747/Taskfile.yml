@@ -2,12 +2,18 @@
 version: '3'
 tasks:
   default:
+    deps:
+      - build-static-m4
+      - build-static-m7
     desc: Compile the STM32 static library for both cores
+  build-static-m4:
     cmds:
       - task: build-static
         vars:
           ARCH_NUMBER: "4"
           EXTRA_FLAG: "-mfpu=fpv4-sp-d16"
+  build-static-m7:
+    cmds:
       - task: build-static
         vars:
           ARCH_NUMBER: "7"
@@ -25,11 +31,15 @@ tasks:
       - ../CM{{.ARCH_NUMBER}}/libs/stm32h7xx.a
     cmds:
       - mkdir -p ../CM{{.ARCH_NUMBER}}/libs
-      - defer: rm *.o
+      - defer: rm m{{.ARCH_NUMBER}}*.o
       - cmd: |-
           set -exu
           for file in *.c; do
-            arm-none-eabi-gcc -c "$file" -o "$file.o" -mcpu=cortex-m{{.ARCH_NUMBER}} -mthumb -mfloat-abi=softfp {{.EXTRA_FLAG}} -DCORE_CM{{.ARCH_NUMBER}} -DSTM32H747xx -DUSE_FULL_LL_DRIVER -I./include -I../CM{{.ARCH_NUMBER}}/include -Os -g
+            arm-none-eabi-gcc -c "$file" -o "m{{.ARCH_NUMBER}}_$file.o" \
+              -mcpu=cortex-m{{.ARCH_NUMBER}} -mthumb -mfloat-abi=softfp \
+              {{.EXTRA_FLAG}} \
+              -I./include -I../CM{{.ARCH_NUMBER}}/include -Os -g \
+              -DCORE_CM{{.ARCH_NUMBER}} -DSTM32H747xx -DUSE_FULL_LL_DRIVER
           done
-      - arm-none-eabi-gcc -c ./startup_stm32h747xx.s -o startup_stm32h747xx.o -mcpu=cortex-m{{.ARCH_NUMBER}} -mthumb
-      - arm-none-eabi-ar rcs ../CM{{.ARCH_NUMBER}}/libs/stm32h7xx.a ./*.o
+      - arm-none-eabi-gcc -c ./startup_stm32h747xx.s -o m{{.ARCH_NUMBER}}_startup_stm32h747xx.o -mcpu=cortex-m{{.ARCH_NUMBER}} -mthumb
+      - arm-none-eabi-ar rcs ../CM{{.ARCH_NUMBER}}/libs/stm32h7xx.a ./m{{.ARCH_NUMBER}}*.o
