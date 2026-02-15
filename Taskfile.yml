@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+includes:
+  stm32:
+    taskfile: ./STM32H747/Taskfile.yml
+    dir: ./STM32H747/
+    internal: true
+  rtos:
+    taskfile: ./FreeRTOS/Taskfile.yml
+    dir: ./FreeRTOS/
+    internal: true
+tasks:
+  compile-m4:
+    internal: true
+    dir: ./CM4/
+    sources:
+      - "**/*.c"
+      - "./include/*"
+    generates:
+      - "**/*.o"
+    cmds:
+      - cmd: |-
+          set -exu
+          for file in *.c; do
+            arm-none-eabi-gcc -c -Wall -Wextra -g -Os -nostdlib\
+              "$file" -o "${file%.c}.o" \
+              -I../FreeRTOS/include/ -I./include/ \
+              -I../FreeRTOS/portable/ARM_CM4F_GCC/ -I../STM32H747/include/ \
+              -I../FreeRTOS/CMSIS_RTOS_V2/ \
+              -MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 \
+              -DSTM32H747xx -DCORE_CM4
+          done
+  build-m4-image:
+    desc: Build the M4 image.
+    deps:
+      - stm32:build-static-m4
+      - rtos:build-m4
+    sources:
+      - "./CM4/*.o"
+      - "./FreeRTOS/**/*.o"
+    generates:
+      - "./test/test_M4.elf.bin"
+    vars:
+      LDFLAGS_ALL: |-
+        -Wl,--gc-sections -Wall -Wextra -Wl,--as-needed \
+        @./CM4/include/ldflags.txt \
+        -T./CM4/include/ldscript.ld \
+        -Wl,-Map,./test/test_m4.map --specs=nosys.specs \
+        -o ./test/test_m4.elf \
+        -Wl,--whole-archive \
+        -Wl,--no-whole-archive \
+        -Wl,--start-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys \
+        -Wl,--end-group
+    cmds:
+      # - task: stm32:build-static-m4
+      # - task: rtos:build-m4
+      - task: compile-m4
+      - cmd: |-
+          files=$(find  . -path ./CM7 -prune -o -name "*.o" -print)
+          arm-none-eabi-g++ {{.LDFLAGS_ALL}} $files -o ./test/test_M4.elf
+      - cmd: arm-none-eabi-objcopy -O binary ./test/test_M4.elf ./test/test_M4.elf.bin

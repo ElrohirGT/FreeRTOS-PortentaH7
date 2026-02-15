@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+tasks:
+  build-m4:
+    desc: Build FreeRTOS for the M4 core
+    cmds:
+      - task: build
+        vars:
+          EXTRA_FLAGS: -MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DCORE_CM4
+          ARCH_NUMBER: "4"
+  build-m7:
+    desc: Build FreeRTOS for the M7 core
+    cmds:
+      - task: build
+        vars:
+          EXTRA_FLAGS: -MMD -mcpu=cortex-m7 -mfloat-abi=softfp -mfpu=fpv5-d16 -DCORE_CM7
+          ARCH_NUMBER: "7"
+  build:
+    internal: true
+    vars:
+      EXTRA_FLAGS: '{{default "-MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DCORE_CM4" .EXTRA_FLAGS}}'
+      ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
+    sources:
+      - "**/*.c"
+      - "**/*.h"
+    generates:
+      - "**/*_m{{.ARCH_NUMBER}}.o"
+    cmds:
+      - defer: rm **/*.d
+      - for: sources
+        cmd: |-
+          file="{{.ITEM}}"
+          if [ ${file: -2} == ".c" ]; then
+            arm-none-eabi-gcc -c -Wall -Wextra -g -Os -nostdlib \
+              -I./include/ -I./portable/ARM_CM4F_GCC/ \
+              -I./CMSIS_RTOS_V2/ -I./../STM32H747/include/ \
+              {{.EXTRA_FLAGS}} -DSTM32H747xx \
+              -I../CM{{.ARCH_NUMBER}}/include/ \
+              "$file" -o "${file%.c}_m{{.ARCH_NUMBER}}.o"
+          fi

@@ -7,18 +7,21 @@ tasks:
       - build-static-m7
     desc: Compile the STM32 static library for both cores
   build-static-m4:
+    desc: Build the static library for the M4 core
     cmds:
       - task: build-static
         vars:
           ARCH_NUMBER: "4"
           EXTRA_FLAG: "-mfpu=fpv4-sp-d16"
   build-static-m7:
+    desc: Build the static library for the M7 core
     cmds:
       - task: build-static
         vars:
           ARCH_NUMBER: "7"
           EXTRA_FLAG: "-mfpu=fpv5-d16"
   build-static:
+    internal: true
     vars:
       ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
       EXTRA_FLAG: '{{default "-mfpu=fpv4-sp-d16" .EXTRA_FLAG}}'
