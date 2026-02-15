@@ -21,11 +21,11 @@ tasks:
           ARCH_NUMBER: "7"
           EXTRA_FLAG: "-mfpu=fpv5-d16"
   build-static:
+    desc: Build the static library for the M{{.ARCH_NUMBER}} core
     internal: true
     vars:
       ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
       EXTRA_FLAG: '{{default "-mfpu=fpv4-sp-d16" .EXTRA_FLAG}}'
-    desc: Compile the STM32 static library for some architecture specified in variables
     sources:
       - "*.c"
       - "./include/*.h"
@@ -34,15 +34,15 @@ tasks:
       - ../CM{{.ARCH_NUMBER}}/libs/stm32h7xx.a
     cmds:
       - mkdir -p ../CM{{.ARCH_NUMBER}}/libs
-      - defer: rm m{{.ARCH_NUMBER}}*.o
+      - defer: rm *_m{{.ARCH_NUMBER}}.o
       - cmd: |-
           set -exu
           for file in *.c; do
-            arm-none-eabi-gcc -c "$file" -o "m{{.ARCH_NUMBER}}_$file.o" \
+          arm-none-eabi-gcc -c "$file" -o "${file%.c}_m{{.ARCH_NUMBER}}.o" \
               -mcpu=cortex-m{{.ARCH_NUMBER}} -mthumb -mfloat-abi=softfp \
               {{.EXTRA_FLAG}} \
               -I./include -I../CM{{.ARCH_NUMBER}}/include -Os -g \
               -DCORE_CM{{.ARCH_NUMBER}} -DSTM32H747xx -DUSE_FULL_LL_DRIVER
           done
-      - arm-none-eabi-gcc -c ./startup_stm32h747xx.s -o m{{.ARCH_NUMBER}}_startup_stm32h747xx.o -mcpu=cortex-m{{.ARCH_NUMBER}} -mthumb
-      - arm-none-eabi-ar rcs ../CM{{.ARCH_NUMBER}}/libs/stm32h7xx.a ./m{{.ARCH_NUMBER}}*.o
+      - arm-none-eabi-gcc -c ./startup_stm32h747xx.s -o startup_stm32h747xx_m{{.ARCH_NUMBER}}.o -mcpu=cortex-m{{.ARCH_NUMBER}} -mthumb
+      - arm-none-eabi-ar rcs ../CM{{.ARCH_NUMBER}}/libs/stm32h7xx.a ./*_m{{.ARCH_NUMBER}}.o

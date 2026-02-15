@@ -16,6 +16,7 @@ tasks:
           EXTRA_FLAGS: -MMD -mcpu=cortex-m7 -mfloat-abi=softfp -mfpu=fpv5-d16 -DCORE_CM7
           ARCH_NUMBER: "7"
   build:
+    desc: Build FreeRTOS for the M{{.ARCH_NUMBER}} core
     internal: true
     vars:
       EXTRA_FLAGS: '{{default "-MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DCORE_CM4" .EXTRA_FLAGS}}'

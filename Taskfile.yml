@@ -10,13 +10,25 @@ includes:
     dir: ./FreeRTOS/
     internal: true
 tasks:
+  default:
+    desc: Build both architecture images in parallel.
+    deps:
+      - task: build-m4-image
+      - task: build-m7-image
   compile-m4:
     internal: true
     cmds:
       - task: compile-core
         vars:
           ARCH_NUMBER: "4"
-          EXTRA_FLAGS: "-MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DCORE_CM4"
+          EXTRA_FLAGS: -MMD -mcpu=cortex-m4 -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -DCORE_CM4
+  compile-m7:
+    internal: true
+    cmds:
+      - task: compile-core
+    vars:
+      ARCH_NUMBER: "7"
+      EXTRA_FLAGS: -MMD -mcpu=cortex-m7 -mfloat-abi=softfp -mfpu=fpv5-d16 -DCORE_CM7
   compile-core:
     internal: true
     vars:
@@ -47,7 +59,15 @@ tasks:
         vars:
           ARCH_NUMBER: "4"
           PRUNE_PATH: "./CM7"
+  build-m7-image:
+    desc: Build the CM7 Portenta Image
+    cmds:
+      - task: build-image
+        vars:
+          ARCH_NUMBER: "7"
+          PRUNE_PATH: "./CM4"
   build-image:
+    label: Build the CM{{.ARCH_NUMBER}} Portenta Image
     internal: true
     vars:
       ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
@@ -69,14 +89,14 @@ tasks:
       - rtos:build-m{{.ARCH_NUMBER}}
     sources:
       - "./CM{{.ARCH_NUMBER}}/*.o"
-      - "./FreeRTOS/**/*.o"
+      - "./FreeRTOS/**/*m{{.ARCH_NUMBER}}.o"
     generates:
       - "./test/test_M{{.ARCH_NUMBER}}.elf.bin"
     cmds:
       - task: compile-m{{.ARCH_NUMBER}}
       - cmd: |-
           set -exu
-          files=$(find  . -path {{.PRUNE_PATH}} -prune -o -name "*.o" -print)
+          files=$(find  . -path {{.PRUNE_PATH}} -prune -o -name "*m{{.ARCH_NUMBER}}.o" -print)
           arm-none-eabi-g++ {{.LDFLAGS_ALL}} $files -o ./test/test_M{{.ARCH_NUMBER}}.elf
       - cmd: arm-none-eabi-objcopy -O binary ./test/test_M{{.ARCH_NUMBER}}.elf ./test/test_M{{.ARCH_NUMBER}}.elf.bin
   clean:
@@ -92,17 +112,32 @@ tasks:
           rm ./test/test_M7.elf.bin
   upload-m4-image:
     desc: Upload the M4 image to the portenta.
+    cmds:
+      - task: upload-image
+        vars:
+          ARCH_NUMBER: "4"
+          DEVICE: "0x2341:0x035b"
+          ADDRESS: "0x08100000:leave"
+  upload-m7-image:
+    desc: Upload the M7 image to the portenta.
+    cmds:
+      - task: upload-image
+        vars:
+          ARCH_NUMBER: "7"
+          DEVICE: "0x2341:0x035b"
+          ADDRESS: "0x08040000:leave"
+  upload-image:
     vars:
       ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
       DEVICE: '{{default "0x2341:0x035b" .DEVICE}}'
       ADDRESS: '{{default "0x08100000:leave" .ADDRESS}}'
     preconditions:
       - sh: |-
-          if [ ! -f ./test/test_M4.elf.bin ]; then
+          if [ ! -f ./test/test_M{{.ARCH_NUMBER}}.elf.bin ]; then
               exit 1
           fi
-        msg: "The ./test/test_M4.elf.bin image couldn't be found! Are you sure this file exists? (If not, try using the build-m4-image task!)"
+        msg: "The ./test/test_M{{.ARCH_NUMBER}}.elf.bin image couldn't be found! Are you sure this file exists? (If not, try using the build-m{{.ARCH_NUMBER}}-image task!)"
     sources:
-      - "./test/test_M4.elf.bin"
+      - "./test/test_M{{.ARCH_NUMBER}}.elf.bin"
     cmds:
       - dfu-util --device {{.DEVICE}} -D ./test/test_M{{.ARCH_NUMBER}}.elf.bin -a0 --dfuse-address={{.ADDRESS}}
