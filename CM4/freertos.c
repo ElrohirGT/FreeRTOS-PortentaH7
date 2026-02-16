@@ -28,9 +28,6 @@ void MX_FREERTOS_Init(void);
 static UART_HandleTypeDef xUARTHandle = {0};
 
 void MX_FREERTOS_Init(void) {
-  // setup(); //<-this line
-  cm4_task_handle = osThreadNew(StartM4DefaultTask, NULL, &cm4_task_attributes);
-
   /* This core uses the UART, so initialise it. */
   xUARTHandle.Instance = USART3;
   xUARTHandle.Init.BaudRate = 115200;
@@ -45,19 +42,23 @@ void MX_FREERTOS_Init(void) {
   HAL_UART_Init(&xUARTHandle);
   HAL_UARTEx_SetRxFifoThreshold(&xUARTHandle, UART_RXFIFO_THRESHOLD_1_4);
   HAL_UARTEx_EnableFifoMode(&xUARTHandle);
+
+  // setup(); //<-this line
+  cm4_task_handle = osThreadNew(StartM4DefaultTask, NULL, &cm4_task_attributes);
 }
 
 void StartM4DefaultTask(void *argument) {
-  GPIO_InitTypeDef GPIO_InitStructure;
-  GPIO_InitStructure.Pin = LED_B_Pin;
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStructure.Speed = GPIO_SPEED_LOW;
+  GPIO_InitTypeDef GPIO_InitStructure = {
+      .Pin = LED_B_Pin,
+      .Mode = GPIO_MODE_OUTPUT_PP,
+      .Speed = GPIO_SPEED_LOW,
+  };
   HAL_GPIO_Init(LED_B_GPIO_Port, &GPIO_InitStructure);
   HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, 1);
   static const uint8_t msg[] = "Hola Mundo!";
   /* Infinite loop */
   while (1) {
-    osDelay(1000);
+    osDelay(500);
     HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
     HAL_UART_Transmit(&xUARTHandle, (uint8_t *)msg, sizeof(msg),
                       mainHAL_MAX_TIMEOUT);
