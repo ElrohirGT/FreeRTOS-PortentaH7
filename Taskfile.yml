@@ -127,6 +127,7 @@ tasks:
           DEVICE: "0x2341:0x035b"
           ADDRESS: "0x08040000:leave"
   upload-image:
+    method: none
     vars:
       ARCH_NUMBER: '{{default "4" .ARCH_NUMBER}}'
       DEVICE: '{{default "0x2341:0x035b" .DEVICE}}'
