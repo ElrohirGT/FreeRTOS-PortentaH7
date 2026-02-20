@@ -7,9 +7,11 @@
 #include "FreeRTOS.h"
 #include "cmsis_os.h"
 #include "main.h"
-// #include "stm32h7xx_hal_gpio.h"
 #include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_gpio.h"
 #include "stm32h7xx_hal_uart.h"
+#include "stm32h7xx_hal_uart_ex.h"
+#include "stm32h7xx_it.h"
 #include "task.h"
 #include <stdint.h>
 
@@ -28,9 +30,6 @@ void MX_FREERTOS_Init(void);
 static UART_HandleTypeDef xUARTHandle = {0};
 
 void MX_FREERTOS_Init(void) {
-  // setup(); //<-this line
-  cm4_task_handle = osThreadNew(StartM4DefaultTask, NULL, &cm4_task_attributes);
-
   /* This core uses the UART, so initialise it. */
   xUARTHandle.Instance = USART3;
   xUARTHandle.Init.BaudRate = 115200;
@@ -45,6 +44,9 @@ void MX_FREERTOS_Init(void) {
   HAL_UART_Init(&xUARTHandle);
   HAL_UARTEx_SetRxFifoThreshold(&xUARTHandle, UART_RXFIFO_THRESHOLD_1_4);
   HAL_UARTEx_EnableFifoMode(&xUARTHandle);
+
+  // setup(); //<-this line
+  cm4_task_handle = osThreadNew(StartM4DefaultTask, NULL, &cm4_task_attributes);
 }
 
 void StartM4DefaultTask(void *argument) {
