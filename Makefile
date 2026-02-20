@@ -23,10 +23,7 @@ all: $(SUB_DIR)
     	do $(MAKE) -C $$subdir all || exit 1; \
     done
 	$(MAKE) info
-	# TODO: Uncomment this once the test.elf rule works!
 	$(MAKE) test_$(MCU).elf
-	# $(MAKE) test_m4.elf
-	# $(MAKE) test_m7.elf
 	@echo Leave $(CURR_DIR)
 
 .PHONY: remake

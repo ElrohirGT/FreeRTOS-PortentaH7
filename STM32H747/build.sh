@@ -27,7 +27,7 @@ for file in *.c; do
 		-mfloat-abi=softfp \
 		"$EXTRA_FLAG" \
 		-DCORE_CM"$ARCH_NUMBER" \
-		-DSTM32H747xx \
+		-DSTM32H747xx -DUSE_FULL_LL_DRIVER \
 		-I./include \
 		-I../CM"$ARCH_NUMBER"/include \
 		-Os -g
