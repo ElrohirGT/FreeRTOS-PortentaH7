@@ -30,39 +30,22 @@ void MX_FREERTOS_Init(void);
 static UART_HandleTypeDef xUARTHandle = {0};
 
 void MX_FREERTOS_Init(void) {
-  /* This core uses the UART, so initialise it. */
-  xUARTHandle.Instance = USART3;
-  xUARTHandle.Init.BaudRate = 115200;
-  xUARTHandle.Init.WordLength = UART_WORDLENGTH_8B;
-  xUARTHandle.Init.StopBits = UART_STOPBITS_1;
-  xUARTHandle.Init.Parity = UART_PARITY_NONE;
-  xUARTHandle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  xUARTHandle.Init.Mode = UART_MODE_TX_RX;
-  xUARTHandle.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  xUARTHandle.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  xUARTHandle.Init.OverSampling = UART_OVERSAMPLING_16;
-  HAL_UART_Init(&xUARTHandle);
-  HAL_UARTEx_SetRxFifoThreshold(&xUARTHandle, UART_RXFIFO_THRESHOLD_1_4);
-  HAL_UARTEx_EnableFifoMode(&xUARTHandle);
-
   // setup(); //<-this line
-  cm4_task_handle = osThreadNew(StartM4DefaultTask, NULL, &cm4_task_attributes);
+  // cm4_task_handle = osThreadNew(StartM4DefaultTask, NULL,
+  // &cm4_task_attributes);
 }
 
 void StartM4DefaultTask(void *argument) {
-  GPIO_InitTypeDef GPIO_InitStructure;
-  GPIO_InitStructure.Pin = LED_B_Pin;
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStructure.Speed = GPIO_SPEED_LOW;
-  HAL_GPIO_Init(LED_B_GPIO_Port, &GPIO_InitStructure);
-  HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, 1);
-  static const uint8_t msg[] = "Hola Mundo!";
-  /* Infinite loop */
-  while (1) {
-    osDelay(1000);
-    HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
-    HAL_UART_Transmit(&xUARTHandle, (uint8_t *)msg, sizeof(msg),
-                      mainHAL_MAX_TIMEOUT);
-  }
+  // GPIO_InitTypeDef GPIO_InitStructure;
+  // GPIO_InitStructure.Pin = LED_B_Pin;
+  // GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+  // GPIO_InitStructure.Speed = GPIO_SPEED_LOW;
+  // HAL_GPIO_Init(LED_B_GPIO_Port, &GPIO_InitStructure);
+  // HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, 1);
+  // /* Infinite loop */
+  // while (1) {
+  //   osDelay(1000);
+  //   HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
+  // }
   // loop(); //<-this line
 }
