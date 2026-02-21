@@ -9,10 +9,7 @@
 #include "cmsis_os.h"
 #include "fmc.h"
 #include "gpio.h"
-#include "stm32h7xx_ll_cortex.h"
-#include "stm32h7xx_ll_hsem.h"
-#include "stm32h7xx_ll_pwr.h"
-#include "stm32h7xx_ll_rcc.h"
+#include "usart.h"
 
 void MX_FREERTOS_Init(void);
 
@@ -25,12 +22,23 @@ int main(void) {
 
   osKernelInitialize(); /* Call init function for freertos objects (in
                            freertos.c) */
+  MX_UART4_Init();
   MX_FREERTOS_Init();
   /* Start scheduler */
   osKernelStart();
 }
 
 void Error_Handler(void) {
+  GPIO_InitTypeDef GPIO_InitStructure;
+  GPIO_InitStructure.Pin = LED_R_Pin;
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStructure.Speed = GPIO_SPEED_LOW;
+  HAL_GPIO_Init(LED_R_GPIO_Port, &GPIO_InitStructure);
+  HAL_GPIO_WritePin(LED_R_GPIO_Port, LED_R_Pin, 1);
+  /* Infinite loop */
   while (1) {
+    osDelay(500);
+    HAL_GPIO_TogglePin(LED_R_GPIO_Port, LED_R_Pin);
   }
+  return;
 }
