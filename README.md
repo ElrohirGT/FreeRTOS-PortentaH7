@@ -11,10 +11,11 @@ performance board released by [Arduino](https://www.arduino.cc).
 
 ### lib
 
+Directory: ./STM32H747/
+
 Build the static library of STM32H7 for CM4 and CM7.
 
 ```sh
-cd ./STM32H747/
 ./build.sh M4
 ./build.sh M7
 ```
