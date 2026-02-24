@@ -55,5 +55,11 @@ Inputs: CORE
 Flash the to the specified core.
 
 ```sh
-make MCU="$CORE" upload
+if [ "$CORE" == "m4" ]; then
+    sudo dfu-util --device 0x2341:0x035b -D ./test/test_M4.elf.bin -a0 --dfuse-address=0x08100000:leave;
+elif [ "$CORE" == "m7" ]; then
+    sudo dfu-util --device 0x2341:0x035b -D ./test/test_M7.elf.bin -a0 --dfuse-address=0x08040000:leave;
+else
+    echo "The CORE variable must be 'm4' or 'm7'!"
+fi
 ```

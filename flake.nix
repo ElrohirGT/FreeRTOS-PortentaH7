@@ -21,9 +21,9 @@
       default = pkgs.mkShell {
         packages = [
           pkgs.gcc-arm-embedded-13
+          pkgs.pkgsCross.arm-embedded.dfu-util
           pkgs.xc
           pkgs.gnumake
-          pkgs.dfu-util
           pkgs.bear
         ];
       };
