@@ -27,15 +27,14 @@ void StartM4DefaultTask(void *argument);
 
 void MX_FREERTOS_Init(void);
 
-/* Handle to the UART used to output strings. */
-static UART_HandleTypeDef xUARTHandle = {0};
-
-void MX_FREERTOS_Init(void) {
+void MX_FREERTOS_Init(void)
+{
   // setup(); //<-this line
   cm4_task_handle = osThreadNew(StartM4DefaultTask, NULL, &cm4_task_attributes);
 }
 
-void StartM4DefaultTask(void *argument) {
+void StartM4DefaultTask(void *argument)
+{
   GPIO_InitTypeDef GPIO_InitStructure;
   GPIO_InitStructure.Pin = LED_B_Pin;
   GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
@@ -44,14 +43,15 @@ void StartM4DefaultTask(void *argument) {
   HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, 1);
   char *msg = "Hola Mundo!";
   /* Infinite loop */
-  while (1) {
-    osDelay(1000);
+  while (1)
+  {
+    osDelay(750);
     HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
     HAL_StatusTypeDef result = HAL_UART_Transmit(
         &huart4, (uint8_t *)msg, sizeof(msg), mainHAL_MAX_TIMEOUT);
-    if (result != HAL_OK) {
+    if (result != HAL_OK)
+    {
       Error_Handler();
     }
   }
-  // loop(); //<-this line
 }
