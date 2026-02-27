@@ -63,3 +63,22 @@ else
     echo "The CORE variable must be 'm4' or 'm7'!"
 fi
 ```
+
+### unity
+
+Directory: ./deps/unity/
+
+Compile the Munit testing framework.
+
+```sh
+gcc -c unity.c -o unity.o
+```
+
+### test
+
+Build and run the test binary. Compile the unity framework first!
+
+```sh
+gcc ./deps/**/*.o ./Common/*_test.c -I./deps -lm -o test.bin
+./test.bin
+```
