@@ -2,18 +2,7 @@
 #include "include/common.h"
 #include <math.h>
 
-void QTZ_String_InitWithCapacity(QTZ_String *self, QTZ_ByteArray *bytes,
-                                 size_t capacity) {
-  self->bytes = bytes;
-  self->capacity = capacity;
-}
-
-void QTZ_String_Init(QTZ_String *self, QTZ_ByteArray *bytes) {
-  self->bytes = bytes;
-  self->capacity = bytes->length;
-}
-
-size_t QTZ_LengthAsString(size_t n) {
+size_t QTZ_DigitQuantity(size_t n) {
   if (n < 2) { // Handle edge cases... AKA (0, 1)
     return 1;
   } else {
@@ -21,11 +10,6 @@ size_t QTZ_LengthAsString(size_t n) {
     return ((size_t)log10(n)) + 1;
   }
 }
-
-typedef enum {
-  QTZ_FMTSIZET_OK,
-  QTZ_FMTSIZET_BUFFER_NOT_LARGE_ENOUGH,
-} QTZ_FMTSIZET_Result;
 
 QTZ_FMTSIZET_Result QTZ_FmtSizeT(size_t n, QTZ_ByteArray *buffer) {
   if (n == 0) {
@@ -36,7 +20,7 @@ QTZ_FMTSIZET_Result QTZ_FmtSizeT(size_t n, QTZ_ByteArray *buffer) {
     buffer->data[0] = '0';
     return QTZ_FMTSIZET_OK;
   } else {
-    size_t buffer_length = QTZ_LengthAsString(n);
+    size_t buffer_length = QTZ_DigitQuantity(n);
     if (buffer->length < buffer_length) {
       return QTZ_FMTSIZET_BUFFER_NOT_LARGE_ENOUGH;
     }

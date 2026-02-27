@@ -7,6 +7,7 @@
 #include "FreeRTOS.h"
 #include "cmsis_os.h"
 #include "main.h"
+#include "portable.h"
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_hal_gpio.h"
 #include "stm32h7xx_hal_uart.h"
@@ -14,7 +15,10 @@
 #include "stm32h7xx_it.h"
 #include "task.h"
 #include "usart.h"
+#include <common.h>
+#include <math.h>
 #include <stdint.h>
+#include <strings.h>
 
 osThreadId_t cm4_task_handle;
 const osThreadAttr_t cm4_task_attributes = {.name = "cm4_task",
@@ -28,8 +32,26 @@ void StartM4DefaultTask(void *argument);
 void MX_FREERTOS_Init(void);
 
 void MX_FREERTOS_Init(void) {
-  // setup(); //<-this line
   cm4_task_handle = osThreadNew(StartM4DefaultTask, NULL, &cm4_task_attributes);
+}
+
+uint16_t strlength(char *msg) {
+  uint16_t length = 0;
+  while (1) {
+    if (msg[length] == 0) {
+      break;
+    }
+    length++;
+  }
+  return length;
+}
+
+void UART_Transmit(char *msg) {
+  HAL_StatusTypeDef result = HAL_UART_Transmit(
+      &huart4, (uint8_t *)msg, strlength(msg), mainHAL_MAX_TIMEOUT);
+  if (result != HAL_OK) {
+    Error_Handler();
+  }
 }
 
 void StartM4DefaultTask(void *argument) {
@@ -39,9 +61,10 @@ void StartM4DefaultTask(void *argument) {
   GPIO_InitStructure.Speed = GPIO_SPEED_LOW;
   HAL_GPIO_Init(LED_B_GPIO_Port, &GPIO_InitStructure);
   HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, 1);
+
   char *msg = "Hola Mundo!\n";
   const int msg_length = 12;
-  /* Infinite loop */
+
   while (1) {
     osDelay(750);
     HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
@@ -50,5 +73,21 @@ void StartM4DefaultTask(void *argument) {
     if (result != HAL_OK) {
       Error_Handler();
     }
+
+    // UART_Transmit("Available HEAP SIZE: ");
+    // size_t free_heap = xPortGetFreeHeapSize();
+    // uint8_t inner_buffer[30] = {0};
+    // ByteArray buffer = {
+    //     .start = inner_buffer,
+    //     .length = 30,
+    // };
+    // if (QTZ_FMTSIZET_OK != QTZ_FmtSizeT(free_heap, &buffer)) {
+    //   Error_Handler();
+    // }
+    // size_t free_heap_size = QTZ_DigitQuantity(free_heap);
+    // if (free_heap_size < 30) {
+    //   inner_buffer[free_heap_size] = '\n';
+    // }
+    // UART_Transmit((char *)buffer.start);
   }
 }

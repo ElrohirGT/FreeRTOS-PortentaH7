@@ -9,8 +9,10 @@
 typedef struct {
 	// The pointer to the first element of the array.
   uint8_t *data;
-	// The total length of the array.
-  size_t length;
+	// The number of bytes this array contains with information.
+	size_t length;
+	// The number of bytes the data can hold.
+  size_t capacity;
 } QTZ_ByteArray;
 
 

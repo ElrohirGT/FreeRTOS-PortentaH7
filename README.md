@@ -79,6 +79,6 @@ gcc -c unity.c -o unity.o
 Build and run the test binary. Compile the unity framework first!
 
 ```sh
-gcc ./deps/**/*.o ./Common/*_test.c -I./deps -lm -o test.bin
+gcc ./deps/**/*.o ./Common/tests/*_test.c -I./deps -lm -o test.bin
 ./test.bin
 ```
