@@ -45,7 +45,7 @@ QTZ_FMTSIZET_Result QTZ_FmtSizeT(size_t n, QTZ_ByteArray *buffer) {
       size_t zeros = buffer_length - i - 1;
       uint8_t character = '?';
       if (zeros > 0) {
-        size_t divider = 10 * zeros;
+        size_t divider = pow(10, zeros);
         size_t digit = n / divider;
         character = digit + '0';
 
