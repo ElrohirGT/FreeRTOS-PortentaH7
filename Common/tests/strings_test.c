@@ -31,7 +31,8 @@ void test_QTZ_LengthAsString(void) {
 void test_QTZ_FmtSizeT(void) {
   // Setup buffer
   uint8_t buffer[8] = {0};
-  QTZ_ByteArray byte_array = {.data = buffer, .length = 8};
+  QTZ_ByteArray byte_array = {0};
+  QTZ_ByteArray_InitWithLength(&byte_array, buffer, 8, 0);
 
 #define QUOTE(name) #name
 #define STR(macro) QUOTE(macro)
@@ -45,6 +46,7 @@ void test_QTZ_FmtSizeT(void) {
     QTZ_FMTSIZET_Result result = QTZ_FmtSizeT(n, &byte_array);                 \
     TEST_ASSERT_EQUAL_INT(QTZ_FMTSIZET_OK, result);                            \
     TEST_ASSERT_EQUAL_STRING_LEN(expected, byte_array.data, length);           \
+    QTZ_ByteArray_Reset(&byte_array);                                          \
   }
 
   TEST_QTZ_FMTSIZET(5);

@@ -12,16 +12,21 @@ size_t QTZ_DigitQuantity(size_t n) {
 }
 
 QTZ_FMTSIZET_Result QTZ_FmtSizeT(size_t n, QTZ_ByteArray *buffer) {
+
   if (n == 0) {
     if (buffer->length <= 0) {
       return QTZ_FMTSIZET_BUFFER_NOT_LARGE_ENOUGH;
     }
 
-    buffer->data[0] = '0';
+    if (QTZ_BYTEARRAYAPPEND_OK != QTZ_ByteArray_Append(buffer, '0')) {
+      return QTZ_FMTSIZET_BUFFER_NOT_LARGE_ENOUGH;
+    }
+
     return QTZ_FMTSIZET_OK;
   } else {
     size_t buffer_length = QTZ_DigitQuantity(n);
-    if (buffer->length < buffer_length) {
+    size_t remaining_space = buffer->capacity - buffer->length;
+    if (remaining_space < buffer_length) {
       return QTZ_FMTSIZET_BUFFER_NOT_LARGE_ENOUGH;
     }
 
@@ -43,7 +48,9 @@ QTZ_FMTSIZET_Result QTZ_FmtSizeT(size_t n, QTZ_ByteArray *buffer) {
         character = '?';
       }
 
-      buffer->data[i] = character;
+      if (QTZ_BYTEARRAYAPPEND_OK != QTZ_ByteArray_Append(buffer, character)) {
+        return QTZ_FMTSIZET_BUFFER_NOT_LARGE_ENOUGH;
+      }
     }
 
     return QTZ_FMTSIZET_OK;
