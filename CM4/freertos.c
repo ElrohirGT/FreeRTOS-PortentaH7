@@ -74,20 +74,19 @@ void StartM4DefaultTask(void *argument) {
       Error_Handler();
     }
 
-    // UART_Transmit("Available HEAP SIZE: ");
-    // size_t free_heap = xPortGetFreeHeapSize();
-    // uint8_t inner_buffer[30] = {0};
-    // ByteArray buffer = {
-    //     .start = inner_buffer,
-    //     .length = 30,
-    // };
-    // if (QTZ_FMTSIZET_OK != QTZ_FmtSizeT(free_heap, &buffer)) {
-    //   Error_Handler();
-    // }
-    // size_t free_heap_size = QTZ_DigitQuantity(free_heap);
-    // if (free_heap_size < 30) {
-    //   inner_buffer[free_heap_size] = '\n';
-    // }
-    // UART_Transmit((char *)buffer.start);
+    UART_Transmit("Available HEAP SIZE: ");
+    size_t free_heap = xPortGetFreeHeapSize();
+    uint8_t buffer[30] = {0};
+    QTZ_ByteArray array = {0};
+    QTZ_ByteArray_Init(&array, buffer, 30);
+    if (QTZ_FMTSIZET_OK != QTZ_FmtSizeT(free_heap, &array)) {
+      Error_Handler();
+    }
+    size_t digits = QTZ_DigitQuantity(free_heap);
+    if (digits < 30) {
+      buffer[digits] = '\n';
+    }
+    UART_Transmit((char *)array.data);
+    QTZ_ByteArray_Reset(&array);
   }
 }
