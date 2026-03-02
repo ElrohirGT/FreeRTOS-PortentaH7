@@ -124,7 +124,7 @@ Directory: ./deps/unity/
 Compile the Munit testing framework.
 
 ```sh
-gcc -c unity.c -o unity.o
+gcc -c unity.c -O2 -o unity.o
 ```
 
 ### test
