@@ -132,8 +132,17 @@ gcc -c unity.c -o unity.o
 Build and run the test binary. Compile the unity framework first!
 
 ```sh
-gcc ./deps/**/*.o ./Common/tests/*_test.c -I./deps -lm -o test.bin
-./test.bin
+set +x
+cd ./Common/tests/
+for file in *.c; do
+    printf "================================================\n"
+    printf "Testing: $file\n"
+    printf "================================================\n"
+    set -x
+    gcc ../../deps/**/*.o "$file" -lm -o test.bin
+    ./test.bin
+    set +x
+done
 ```
 
 ### bear
