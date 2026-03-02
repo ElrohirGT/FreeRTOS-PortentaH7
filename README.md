@@ -136,7 +136,7 @@ set +x
 cd ./Common/tests/
 for file in *.c; do
     printf "================================================\n"
-    printf "Testing: $file\n"
+    printf "Testing: %s\n" "$file"
     printf "================================================\n"
     set -x
     gcc ../../deps/**/*.o "$file" -lm -o test.bin
