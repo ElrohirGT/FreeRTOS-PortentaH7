@@ -47,8 +47,9 @@ def writePacket(
     res_buff[5] = param1  # Param1
 
 
-PROTOCOL_SUBSYSTEMS = b"S"
-SUBSYSTEM_PORTENTA = b"P"
+PROTOCOL_SUBSYSTEMS = ord("S")
+SUBSYSTEM_MILO = ord("M")
+SUBSYSTEM_PORTENTA = ord("P")
 
 # ================= COMMANDS
 PING_ACK = 15
@@ -63,6 +64,9 @@ def load_labels(path):
 net = None
 current_model = 0
 mode = 0
+
+best_label = "Error"
+best_score = 0
 
 
 def load_model(model_id):
@@ -90,6 +94,8 @@ def load_model(model_id):
     gc.collect()
 
 
+load_model(1)
+
 while True:
     try:
         i2c.recv(req_buff, timeout=10)
@@ -100,7 +106,7 @@ while True:
         param0 = req_buff[4]
         param1 = req_buff[5]
 
-        if subsys != b"M":  # ignore not milo messages
+        if subsys != SUBSYSTEM_MILO:  # ignore not milo messages
             continue
 
         if cmd == 14:  # MILO PING
