@@ -83,6 +83,13 @@ typedef enum {
   QTZ_OBC_COMMAND_MILO_TAKE_PICTURE_ACK,
   QTZ_OBC_COMMAND_MILO_PICTURE_CLASI,
   QTZ_OBC_COMMAND_MILO_PICTURE_CLASI_ACK,
+
+  /*
+   * ===========================
+   * GENERAL COMMANDS
+   * ===========================
+   */
+  QTZ_OBC_COMMAND_TIMEOUT,
 } QTZ_OBC_Command;
 
 // Max iterations allowed for the OBC before aborting I2C and UART transmittion.

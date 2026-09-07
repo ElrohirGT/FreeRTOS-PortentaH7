@@ -16,7 +16,9 @@ const QTZ_OBC_Packet TIMEOUT_RESPONSE = {
     .protocol_id = QTZ_OBC_PROTOCOL_SUBSYSTEMS,
     .status = QTZ_OBC_RESULT_TIMEOUT,
     .subsys = QTZ_OBC_SUBSYSTEM_PORTENTA,
-    .cmd_id = 0,
+    .cmd_id = QTZ_OBC_COMMAND_TIMEOUT,
+    .param0 = 0,
+    .param1 = 0,
 };
 
 // -- BUFFERS --
