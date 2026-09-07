@@ -52,7 +52,7 @@ typedef enum {
   QTZ_BYTEARRAYSET_OK,
   QTZ_BYTEARRAYSET_INDEX_OUT_OF_BOUNDS,
 } QTZ_BYTEARRAYSET_Result;
-// Attempt to get a byte from the array.
+// Attempt to set a byte from the array.
 QTZ_BYTEARRAYSET_Result QTZ_ByteArray_Set(QTZ_ByteArray *self, size_t index,
                                           uint8_t value);
 

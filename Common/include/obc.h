@@ -4,7 +4,8 @@
 
 typedef enum {
   QTZ_OBC_RESULT_OK,
-  QTZ_OBC_RESULT_ERROR
+  QTZ_OBC_RESULT_ERROR,
+  QTZ_OBC_RESULT_TIMEOUT,
 } QTZ_OBC_OperationResult;
 
 // All req/resp packets follow the pattern:
