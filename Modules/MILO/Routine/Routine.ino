@@ -6,9 +6,11 @@ constexpr uint32_t RS485_BAUD = 115200;
 constexpr uint32_t RS485_INTERBYTE_TIMEOUT_MS = 50;
 
 constexpr uint8_t I2C_SLAVE_ADDR = 0x08;
-constexpr uint32_t I2C_CLOCK_HZ = 115200;
+// constexpr uint32_t I2C_CLOCK_HZ = 115200;
 constexpr uint32_t I2C_RESPONSE_TIMEOUT_MS = 100;
 constexpr uint32_t I2C_POLL_INTERVAL_MS = 2;
+
+constexpr uint8_t OPENMV_RESET_PIN = 3;
 
 const QTZ_OBC_Packet TIMEOUT_RESPONSE = {
     .protocol_id = QTZ_OBC_PROTOCOL_SUBSYSTEMS,
@@ -41,6 +43,9 @@ void setup() {
 
   Wire.begin();
   // Wire.setClock(I2C_CLOCK_HZ);
+
+  pinMode(OPENMV_RESET_PIN, OUTPUT);
+  digitalWrite(OPENMV_RESET_PIN, 1);
 }
 
 void loop() {
@@ -57,9 +62,9 @@ void loop() {
     }
 
     // Reset the OpenMV cam once the picture has been taken...
-    QTZ_OBC_Packet p;
+    QTZ_OBC_Packet p = {0};
     QTZ_OBC_ParsePacket(&RES, &p);
-    if (p.cmd_id == QTZ_OBC_COMMAND_MILO_TAKE_PICTURE_ACK) {
+    if (p.cmd_id == QTZ_OBC_COMMAND_MILO_PICTURE_CLASI_ACK) {
       // Reset corto
       Serial.println("Resetting Cam...");
       Serial.println("Reset LOW");
@@ -93,6 +98,7 @@ bool receiveRS485Command(QTZ_ByteArray *buff) {
                (millis() - last_byte_at > RS485_INTERBYTE_TIMEOUT_MS)) {
       // Frame stalled mid-way, discard and start over.
       received = 0;
+      QTZ_ByteArray_Reset(buff);
     }
   }
 
@@ -109,11 +115,11 @@ bool sendI2CCommandAndWait(QTZ_ByteArray *req_buff, QTZ_ByteArray *res_buff,
 
   uint32_t start = millis();
   while (millis() - start < timeout_ms) {
-    uint8_t n = Wire.requestFrom((int)I2C_SLAVE_ADDR, resp_buff->capacity);
-    if (n == resp_buff->capacity) {
-      resp_buff->length = resp_buff->capacity;
-      for (uint8_t i = 0; i < resp_buff->capacity; i++) {
-        QTZ_ByteArray_Set(resp_buff, i, Wire.read());
+    uint8_t n = Wire.requestFrom((int)I2C_SLAVE_ADDR, res_buff->capacity);
+    if (n == res_buff->capacity) {
+      res_buff->length = res_buff->capacity;
+      for (uint8_t i = 0; i < res_buff->capacity; i++) {
+        QTZ_ByteArray_Set(res_buff, i, Wire.read());
       }
       return true;
     }
