@@ -56,6 +56,20 @@ void loop() {
       }
     }
 
+    // Reset the OpenMV cam once the picture has been taken...
+    QTZ_OBC_Packet p;
+    QTZ_OBC_ParsePacket(&RES, &p);
+    if (p.cmd_id == QTZ_OBC_COMMAND_MILO_TAKE_PICTURE_ACK) {
+      // Reset corto
+      Serial.println("Resetting Cam...");
+      Serial.println("Reset LOW");
+      digitalWrite(OPENMV_RESET_PIN, LOW);
+      delay(500);
+
+      Serial.println("Reset HIGH");
+      digitalWrite(OPENMV_RESET_PIN, HIGH);
+    }
+
     sendRS485Response(&RES);
   }
 }
