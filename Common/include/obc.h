@@ -141,7 +141,7 @@ typedef struct {
   volatile uint32_t watchdog_ticks;
 } QTZ_OBC_Ctx;
 
-static QTZ_OBC_Ctx GLOBAL_CTX;
+extern QTZ_OBC_Ctx GLOBAL_CTX;
 
 // Tick the main OBC routine to the next step on the simulation.
 void QTZ_OBC_Routine_Tick(QTZ_OBC_Ctx *ctx);

@@ -13,6 +13,8 @@ char *QTZ_OBC_StateToStr(QTZ_OBC_State st) {
     return "ERROR";
   case QTZ_OBC_STATE_HANDOVER_IDLE:
     return "HANDOVER_IDLE";
+  default:
+    return "UNKNOWN";
   }
 }
 
@@ -80,7 +82,10 @@ char *QTZ_OBC_CommandToStr(QTZ_OBC_Command cmd) {
     return "ABORT_HANDOVER";
   case QTZ_OBC_COMMAND_GOMSPACE_ABORT_HANDOVER_ACK:
     return "ABORT_HANDOVER_ACK";
-    break;
+  case QTZ_OBC_COMMAND_TIMEOUT:
+    return "TIMEOUT";
+  default:
+    return "UNKNOWN";
   }
 }
 
@@ -89,6 +94,7 @@ QTZ_OBC_OperationResult QTZ_OBC_ParsePacket(QTZ_ByteArray *buffer,
   if (buffer == NULL || p == NULL) {
     return QTZ_OBC_RESULT_ERROR;
   }
+
   if (buffer->length < QTZ_OBC_PACKET_LEN) {
     return QTZ_OBC_RESULT_ERROR;
   }

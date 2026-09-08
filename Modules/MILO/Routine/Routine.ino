@@ -61,21 +61,20 @@ void loop() {
       if (QTZ_OBC_RESULT_OK != QTZ_OBC_WritePacket(&RES, TIMEOUT_RESPONSE)) {
         Serial.println("Failed to write the timeout to the response buffer!");
       }
-      return;
-    }
+    } else {
+      // Reset the OpenMV cam once the picture has been taken...
+      QTZ_OBC_Packet p = {0};
+      QTZ_OBC_ParsePacket(&RES, &p);
+      if (p.cmd_id == QTZ_OBC_COMMAND_MILO_PICTURE_CLASI_ACK) {
+        // Reset corto
+        Serial.println("Resetting Cam...");
+        Serial.println("Reset LOW");
+        digitalWrite(OPENMV_RESET_PIN, LOW);
+        delay(500);
 
-    // Reset the OpenMV cam once the picture has been taken...
-    QTZ_OBC_Packet p = {0};
-    QTZ_OBC_ParsePacket(&RES, &p);
-    if (p.cmd_id == QTZ_OBC_COMMAND_MILO_PICTURE_CLASI_ACK) {
-      // Reset corto
-      Serial.println("Resetting Cam...");
-      Serial.println("Reset LOW");
-      digitalWrite(OPENMV_RESET_PIN, LOW);
-      delay(500);
-
-      Serial.println("Reset HIGH");
-      digitalWrite(OPENMV_RESET_PIN, HIGH);
+        Serial.println("Reset HIGH");
+        digitalWrite(OPENMV_RESET_PIN, HIGH);
+      }
     }
 
     sendRS485Response(&RES);

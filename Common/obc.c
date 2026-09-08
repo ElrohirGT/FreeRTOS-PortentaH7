@@ -1,3 +1,4 @@
+#include "include/obc.h"
 #include "include/debug.h"
 #include "obc_submodules_sdk.c"
 #include <string.h>
@@ -17,6 +18,8 @@
 #define QTZ_OBC_SENDING_COMMAND_FMT                                            \
   "[" QTZ_OBC_ROUTINE_PREFIX                                                   \
   "]: State: [%-25s][%-25s], sending  command: [%c][%d][%c][%-20s][%d][%d]"
+
+QTZ_OBC_Ctx GLOBAL_CTX;
 
 // -- I2C --
 uint8_t i2c_rx_buffer[QTZ_OBC_I2C_RX_LEN];
