@@ -45,6 +45,9 @@ void QTZ_OBC_InitWithGlobals(QTZ_OBC_Ctx *ctx) {
 
   ctx->state = QTZ_OBC_STATE_IDLE;
   ctx->watchdog_ticks = 0;
+
+  // Arm the receiver interrupt
+  QTZ_OBC_ArmInterrupts();
 }
 
 #define QTZ_OBC_RespondWithPacket(ctx, buffer, p)                              \

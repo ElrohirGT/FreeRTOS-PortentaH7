@@ -1,9 +1,57 @@
 #include "cmsis_os2.h"
 #include "common.h"
 #include "debug.h"
+#include "stm32h7xx_hal_uart.h"
+#include <obc.h>
 #include <rs485.h>
 #include <strings.h>
 #include <usart.h>
+
+#define QTZ_RS485_DEBUG_PREFIX "[OBC-RS485] "
+
+void QTZ_RS485_OnRxComplete(UART_HandleTypeDef *ctx) {
+  if (ctx == NULL) {
+    return;
+  }
+  GLOBAL_CTX.watchdog_ticks = 0U;
+  // if (GLOBAL_CTX.uart_rs485.tx.length == 0) {
+  //   return;
+  // }
+  // if (HAL_UART_Transmit_IT(ctx, GLOBAL_CTX.uart_rs485.tx.data,
+  //                          GLOBAL_CTX.uart_rs485.tx.capacity) != HAL_OK) {
+  //   QTZ_Debug_Error(
+  //       QTZ_RS485_DEBUG_PREFIX
+  //       "Failed to rearm the receiver for the next frame of RS485.");
+  //   GLOBAL_CTX.state = QTZ_OBC_STATE_ERROR;
+  // }
+}
+
+void QTZ_RS485_OnTxComplete(UART_HandleTypeDef *ctx) {
+  if (ctx == NULL) {
+    return;
+  }
+  QTZ_ByteArray_Reset(&GLOBAL_CTX.uart_rs485.tx);
+  GLOBAL_CTX.watchdog_ticks = 0U;
+  if (HAL_UART_Receive_IT(ctx, GLOBAL_CTX.uart_rs485.rx.data,
+                          GLOBAL_CTX.uart_rs485.rx.capacity) != HAL_OK) {
+    QTZ_Debug_Error(
+        QTZ_RS485_DEBUG_PREFIX
+        "Failed to rearm the receiver for the next frame of RS485.");
+    GLOBAL_CTX.state = QTZ_OBC_STATE_ERROR;
+  }
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart == &huart4) {
+    QTZ_RS485_OnRxComplete(huart);
+  }
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart == &huart4) {
+    QTZ_RS485_OnTxComplete(huart);
+  }
+}
 
 // Enabled transmission but also disables reception
 void QTZ_RS485_BeginTransmission() {

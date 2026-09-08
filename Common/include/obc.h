@@ -143,4 +143,13 @@ typedef struct {
 
 static QTZ_OBC_Ctx GLOBAL_CTX;
 
+// Tick the main OBC routine to the next step on the simulation.
+void QTZ_OBC_Routine_Tick(QTZ_OBC_Ctx *ctx);
+
+// Initialize the OBC with the default global buffers.
+void QTZ_OBC_InitWithGlobals(QTZ_OBC_Ctx *ctx);
+
+// Arm the interrupts for receiving commands.
+void QTZ_OBC_ArmInterrupts();
+
 #endif

@@ -5,7 +5,7 @@
 constexpr uint32_t RS485_BAUD = 115200;
 constexpr uint32_t RS485_INTERBYTE_TIMEOUT_MS = 50;
 
-constexpr uint8_t I2C_SLAVE_ADDR = 0x08;
+constexpr uint8_t I2C_SLAVE_ADDR = 0x42;
 // constexpr uint32_t I2C_CLOCK_HZ = 115200;
 constexpr uint32_t I2C_RESPONSE_TIMEOUT_MS = 100;
 constexpr uint32_t I2C_POLL_INTERVAL_MS = 2;
@@ -61,6 +61,7 @@ void loop() {
       if (QTZ_OBC_RESULT_OK != QTZ_OBC_WritePacket(&RES, TIMEOUT_RESPONSE)) {
         Serial.println("Failed to write the timeout to the response buffer!");
       }
+      return;
     }
 
     // Reset the OpenMV cam once the picture has been taken...
