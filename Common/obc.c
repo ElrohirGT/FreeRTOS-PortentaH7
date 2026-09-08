@@ -140,10 +140,10 @@ void QTZ_OBC_HandleHandoverCommand(QTZ_OBC_Ctx *ctx, QTZ_OBC_Packet *p) {
         ctx->milo_task.state != QTZ_OBC_MILO_TASK_STATE_END) {
       QTZ_Debug_Warning(
           QTZ_OBC_STATE_MACHINE_FAIL_TRANSITION2_LOG_FMT,
-          QTZ_OBC_StateToStr(ctx->milo_task.state),
-          QTZ_OBC_StateToStr(QTZ_OBC_MILO_TASK_STATE_TAKE_PICTURE),
-          QTZ_OBC_StateToStr(QTZ_OBC_MILO_TASK_STATE_UNSTARTED),
-          QTZ_OBC_StateToStr(QTZ_OBC_MILO_TASK_STATE_END));
+          QTZ_OBC_MiloTaskToStr(ctx->milo_task.state),
+          QTZ_OBC_MiloTaskToStr(QTZ_OBC_MILO_TASK_STATE_TAKE_PICTURE),
+          QTZ_OBC_MiloTaskToStr(QTZ_OBC_MILO_TASK_STATE_UNSTARTED),
+          QTZ_OBC_MiloTaskToStr(QTZ_OBC_MILO_TASK_STATE_END));
       return;
     }
     ctx->milo_task.state = QTZ_OBC_MILO_TASK_STATE_BEGIN;
