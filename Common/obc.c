@@ -1,6 +1,5 @@
 #include "include/obc.h"
 #include "include/debug.h"
-#include "obc_submodules_sdk.c"
 #include <string.h>
 
 #define QTZ_OBC_ROUTINE_PREFIX "OBC-MR"

@@ -152,4 +152,15 @@ void QTZ_OBC_InitWithGlobals(QTZ_OBC_Ctx *ctx);
 // Arm the interrupts for receiving commands.
 void QTZ_OBC_ArmInterrupts();
 
+// =================
+// -- Private API --
+// =================
+char *QTZ_OBC_StateToStr(QTZ_OBC_State st);
+char *QTZ_OBC_MiloTaskToStr(int variant);
+char *QTZ_OBC_CommandToStr(QTZ_OBC_Command cmd);
+QTZ_OBC_OperationResult QTZ_OBC_ParsePacket(QTZ_ByteArray *buffer,
+                                            QTZ_OBC_Packet *p);
+QTZ_OBC_OperationResult QTZ_OBC_WritePacket(QTZ_ByteArray *buffer,
+                                            QTZ_OBC_Packet p);
+
 #endif

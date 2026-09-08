@@ -1,7 +1,6 @@
 #include "cmsis_os2.h"
 #include "common.h"
 #include "debug.h"
-#include "stm32h7xx_hal_uart.h"
 #include <obc.h>
 #include <rs485.h>
 #include <strings.h>
@@ -14,16 +13,6 @@ void QTZ_RS485_OnRxComplete(UART_HandleTypeDef *ctx) {
     return;
   }
   GLOBAL_CTX.watchdog_ticks = 0U;
-  // if (GLOBAL_CTX.uart_rs485.tx.length == 0) {
-  //   return;
-  // }
-  // if (HAL_UART_Transmit_IT(ctx, GLOBAL_CTX.uart_rs485.tx.data,
-  //                          GLOBAL_CTX.uart_rs485.tx.capacity) != HAL_OK) {
-  //   QTZ_Debug_Error(
-  //       QTZ_RS485_DEBUG_PREFIX
-  //       "Failed to rearm the receiver for the next frame of RS485.");
-  //   GLOBAL_CTX.state = QTZ_OBC_STATE_ERROR;
-  // }
 }
 
 void QTZ_RS485_OnTxComplete(UART_HandleTypeDef *ctx) {

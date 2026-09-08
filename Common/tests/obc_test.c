@@ -2,6 +2,7 @@
 #include "../common.c"
 #include "../debug.c"
 #include "../obc.c"
+#include "../obc_submodules_sdk.c"
 #include <stdio.h>
 
 // =======================================
