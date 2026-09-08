@@ -44,7 +44,7 @@ void MX_I2C1_Init(void) {
   hi2c1.Instance = I2C1;
   hi2c1.Init.Timing = 0x10C0ECFF;
   hi2c1.Init.OwnAddress1 =
-      (0x09
+      (0x50
        << 1); // Supposedly the HAL API expects the address to be shifted by 1.
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
